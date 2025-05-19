@@ -752,31 +752,39 @@ class OptionWidget extends StatelessWidget {
             ),
           ),
           if (title == 'Ordernar por:')
-            DropdownButton<String>(
-              value: selectedValue, // Establecer el valor seleccionado
-              onChanged: (String? value) {
-                if (value != null) {
-                  // Llama al callback con la opción seleccionada
-                  onSelected(value);
-                }
-              },
-              style: const TextStyle(
-                color: Color.fromARGB(255, 255, 255, 255),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 10),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(15),
               ),
-              items: [
-                'Seleccionar',
-                'Numerocp',
-                'Puerto',
-                'Situación',
-                "TitularDeCp"
-              ]
-                  .map<DropdownMenuItem<String>>(
-                    (String value) => DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    ),
-                  )
-                  .toList(),
+              child: DropdownButton<String>(
+                value: selectedValue, // Establecer el valor seleccionado
+                onChanged: (String? value) {
+                  if (value != null) {
+                    // Llama al callback con la opción seleccionada
+                    onSelected(value);
+                  }
+                },
+                style: const TextStyle(
+                  backgroundColor: Colors.white,
+                  color: Color.fromARGB(255, 0, 0, 0),
+                ),
+                items: [
+                  'Seleccionar',
+                  'Numerocp',
+                  'Puerto',
+                  'Situación',
+                  "TitularDeCp"
+                ]
+                    .map<DropdownMenuItem<String>>(
+                      (String value) => DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      ),
+                    )
+                    .toList(),
+              ),
             ),
         ],
       ),

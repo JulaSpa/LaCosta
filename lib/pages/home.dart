@@ -19,10 +19,12 @@ class _MyHomePageState extends State<MyHomePage> {
   String isAccesoTrue = "true"; //USUARIO Y CONTRASEÑA CORRECTO?
 
   List<dynamic>? posicion;
-  bool posLista = true;
-  bool alertLista = true;
+
   List<dynamic>? alertas;
   List? title;
+
+  bool posLista = true;
+  bool alertLista = true;
   @override
   void initState() {
     super.initState();
@@ -156,7 +158,8 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Colors.transparent,
         appBar: AppBar(
           elevation: 0,
-          automaticallyImplyLeading: false, // Desactivamos el automático
+          iconTheme: const IconThemeData(color: Colors.white),
+          automaticallyImplyLeading: true, // Desactivamos el automático
           title: Row(
             mainAxisSize: MainAxisSize.min, // evita que se estire demasiado
             children: [
