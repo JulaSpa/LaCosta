@@ -660,20 +660,24 @@ class _AlertasState extends State<Alertas> {
                                                         ),
                                                       ),
                                                     ),
-                                                    Expanded(
-                                                      child: Text(
-                                                        album.imagen == true
-                                                            ? "Link"
-                                                            : "Link",
-                                                        style: const TextStyle(
-                                                          fontSize: 15,
-                                                          color: Color.fromARGB(
-                                                              255,
-                                                              255,
-                                                              255,
-                                                              255),
-                                                        ),
-                                                      ),
+                                                    Center(
+                                                      child: album.imagen ==
+                                                              true
+                                                          ? const Icon(
+                                                              Icons
+                                                                  .image_outlined,
+                                                              color:
+                                                                  Colors.white,
+                                                              size: 25,
+                                                            )
+                                                          : const Text(
+                                                              "Sin imagen",
+                                                              style: TextStyle(
+                                                                fontSize: 15,
+                                                                color: Colors
+                                                                    .white,
+                                                              ),
+                                                            ),
                                                     ),
                                                   ],
                                                 ),
@@ -811,7 +815,14 @@ void _downLoad(
     final usuario = username;
     final clave = password;
     final nnroCP = nroCP;
-
+    //CARGA
+    showDialog(
+      context: context,
+      /* barrierDismissible: false, // evita que se cierre tocando fuera */
+      builder: (context) => const Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
     final uri = Uri.parse(
       'http://app.lacostacereales.com.ar/api/Documento/Imagenes?usuario=$usuario&clave=$clave&NroCP=$nnroCP&fechaD=16/5/25&fechaH=16/5/25',
     );
@@ -822,7 +833,7 @@ void _downLoad(
         'Content-Type': 'application/json; charset=UTF-8',
       },
     );
-
+    Navigator.of(context).pop(); // Cierra el diálogo de carga
     print("Status code: ${response.statusCode}");
     print("Body: ${response.body}");
 
@@ -836,13 +847,16 @@ void _downLoad(
         _showImageDialog(context, base64Image);
       } else {
         print('Error al descargar la imagen');
+        Navigator.of(context).pop(); // Cierra el diálogo de carga
       }
     } catch (e) {
       print('Error al descargar la imagen: $e');
+      Navigator.of(context).pop(); // Cierra el diálogo de carga
       // Mostrar un diálogo de error
     }
   } catch (e) {
     print("Error en _downLoad: $e");
+    Navigator.of(context).pop(); // Cierra el diálogo de carga
   }
 }
 

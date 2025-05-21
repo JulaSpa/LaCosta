@@ -687,18 +687,24 @@ class _BuscarState extends State<Buscar> {
                                                         ),
                                                       ),
                                                     ),
-                                                    Expanded(
-                                                      child: Text(
-                                                        album.imagen.toString(),
-                                                        style: const TextStyle(
-                                                          fontSize: 15,
-                                                          color: Color.fromARGB(
-                                                              255,
-                                                              255,
-                                                              255,
-                                                              255),
-                                                        ),
-                                                      ),
+                                                    Center(
+                                                      child: album.imagen ==
+                                                              true
+                                                          ? const Icon(
+                                                              Icons
+                                                                  .image_outlined,
+                                                              color:
+                                                                  Colors.white,
+                                                              size: 25,
+                                                            )
+                                                          : const Text(
+                                                              "Sin imagen",
+                                                              style: TextStyle(
+                                                                fontSize: 15,
+                                                                color: Colors
+                                                                    .white,
+                                                              ),
+                                                            ),
                                                     ),
                                                   ],
                                                 ),
@@ -840,7 +846,14 @@ void _downLoad(
     final nnroCP = nroCP;
     final fromDate = fechaFormateadaD;
     final toDate = fechaFormateadaH;
-
+    //CARGA
+    showDialog(
+      context: context,
+      /* barrierDismissible: false, // evita que se cierre tocando fuera */
+      builder: (context) => const Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
     final uri = Uri.parse(
       'http://app.lacostacereales.com.ar/api/Documento/Imagenes?usuario=$usuario&clave=$clave&NroCP=$nnroCP&fechaD=$fromDate&fechaH=$toDate',
     );
@@ -851,7 +864,7 @@ void _downLoad(
         'Content-Type': 'application/json; charset=UTF-8',
       },
     );
-
+    Navigator.of(context).pop(); // Cierra el diálogo de carga
     print("Status code: ${response.statusCode}");
     print("Body: ${response.body}");
 
@@ -869,9 +882,11 @@ void _downLoad(
     } catch (e) {
       print('Error al descargar la imagen: $e');
       // Mostrar un diálogo de error
+      Navigator.of(context).pop(); // Cierra el diálogo de carga
     }
   } catch (e) {
     print("Error en _downLoad: $e");
+    Navigator.of(context).pop(); // Cierra el diálogo de carga
   }
 }
 

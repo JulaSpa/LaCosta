@@ -22,9 +22,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   List<dynamic>? alertas;
   List? title;
+  bool _isLoading = true;
 
-  bool posLista = true;
-  bool alertLista = true;
   @override
   void initState() {
     super.initState();
@@ -37,6 +36,9 @@ class _MyHomePageState extends State<MyHomePage> {
       contarAlertas(),
       contarPosicion(),
     ]);
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   //DATA DE SHARED
@@ -91,7 +93,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
     setState(() {
       this.posicion = posicion;
-      posLista = false;
     });
 
     return posicion;
@@ -123,7 +124,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
     setState(() {
       this.alertas = alertas;
-      alertLista = false;
     });
 
     return alertas;
@@ -135,7 +135,7 @@ class _MyHomePageState extends State<MyHomePage> {
     contarAlertas();
     _getStoredUserData();
     // Simulando una pausa de 2 segundos
-    await Future.delayed(const Duration(seconds: 1));
+    await Future.delayed(const Duration(seconds: 2));
   }
 
   @override
@@ -183,12 +183,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
           toolbarHeight: 120,
         ),
-        body: posLista == true && alertLista == true
+        body: _isLoading
             ? const Center(
-                child: CircularProgressIndicator(),
-              )
+                child: CircularProgressIndicator()) // muestra loading
             : isAccesoTrue == "true"
-                ? _buildScrollView()
+                ? _buildScrollView() // contenido principal
                 : _buildErrorText(),
       )
     ]);
@@ -197,259 +196,250 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget _buildScrollView() {
     return RefreshIndicator(
       onRefresh: _refresh,
-      child: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.only(top: 100),
-          child: Center(
-            child: Wrap(
-              spacing: 85, // espacio horizontal entre columnas
-              runSpacing: 50, // espacio vertical entre filas
-              alignment: WrapAlignment.center,
-              children: [
-                // MI PERFIL
-                InkWell(
-                  onTap: () {
-                    Navigator.pushNamed(context, "/perfil");
-                  },
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        width: 90,
-                        height: 90,
-                        decoration: BoxDecoration(
-                          color: Color.fromARGB(117, 190, 66, 16),
-                          borderRadius: BorderRadius.circular(100),
-                          border: Border.all(
-                              color: Color.fromARGB(117, 190, 66, 16)),
-                        ),
-                        child: const Center(
-                          child: Icon(
-                            Icons.account_circle_outlined,
-                            color: Colors.white,
-                            size: 50,
-                          ),
-                        ),
+      child: ListView(padding: const EdgeInsets.only(top: 100), children: [
+        Center(
+          child: Wrap(
+            spacing: 85, // espacio horizontal entre columnas
+            runSpacing: 50, // espacio vertical entre filas
+            alignment: WrapAlignment.center,
+            children: [
+              // MI PERFIL
+              InkWell(
+                onTap: () {
+                  Navigator.pushNamed(context, "/perfil");
+                },
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 90,
+                      height: 90,
+                      decoration: BoxDecoration(
+                        color: Color.fromARGB(117, 190, 66, 16),
+                        borderRadius: BorderRadius.circular(100),
+                        border:
+                            Border.all(color: Color.fromARGB(117, 190, 66, 16)),
                       ),
-                      const SizedBox(
-                          height: 8), // espacio entre cuadrado y texto
-                      const Text(
-                        "Mi perfil",
-                        style: TextStyle(
+                      child: const Center(
+                        child: Icon(
+                          Icons.account_circle_outlined,
                           color: Colors.white,
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
+                          size: 50,
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(height: 8), // espacio entre cuadrado y texto
+                    const Text(
+                      "Mi perfil",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
                 ),
+              ),
 
-                // ALERTAS
-                InkWell(
-                  onTap: () {
-                    Navigator.pushNamed(context, "/alertas");
-                  },
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        width: 90,
-                        height: 90,
-                        decoration: BoxDecoration(
-                          color: Color.fromARGB(117, 190, 66, 16),
-                          borderRadius: BorderRadius.circular(100),
-                          border: Border.all(
-                              color: Color.fromARGB(117, 190, 66, 16)),
-                        ),
-                        child: const Center(
-                          child: Icon(
-                            Icons.campaign_rounded,
-                            color: Colors.white,
-                            size: 50,
-                          ),
-                        ),
+              // ALERTAS
+              InkWell(
+                onTap: () {
+                  Navigator.pushNamed(context, "/alertas");
+                },
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 90,
+                      height: 90,
+                      decoration: BoxDecoration(
+                        color: Color.fromARGB(117, 190, 66, 16),
+                        borderRadius: BorderRadius.circular(100),
+                        border:
+                            Border.all(color: Color.fromARGB(117, 190, 66, 16)),
                       ),
-                      const SizedBox(
-                          height: 8), // espacio entre cuadrado y texto
-                      Text(
-                        "Alertas (${alertas?.length})",
-                        style: const TextStyle(
+                      child: const Center(
+                        child: Icon(
+                          Icons.campaign_rounded,
                           color: Colors.white,
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
+                          size: 50,
                         ),
-                        textAlign: TextAlign.center,
                       ),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(height: 8), // espacio entre cuadrado y texto
+                    Text(
+                      "Alertas (${alertas?.length})",
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
                 ),
-                // POSICION
-                InkWell(
-                  onTap: () {
-                    Navigator.pushNamed(context, "/position");
-                  },
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        width: 90,
-                        height: 90,
-                        decoration: BoxDecoration(
-                          color: Color.fromARGB(117, 190, 66, 16),
-                          borderRadius: BorderRadius.circular(100),
-                          border: Border.all(
-                              color: Color.fromARGB(117, 190, 66, 16)),
-                        ),
-                        child: const Center(
-                          child: Icon(
-                            Icons.location_on,
-                            color: Colors.white,
-                            size: 50,
-                          ),
-                        ),
+              ),
+              // POSICION
+              InkWell(
+                onTap: () {
+                  Navigator.pushNamed(context, "/position");
+                },
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 90,
+                      height: 90,
+                      decoration: BoxDecoration(
+                        color: Color.fromARGB(117, 190, 66, 16),
+                        borderRadius: BorderRadius.circular(100),
+                        border:
+                            Border.all(color: Color.fromARGB(117, 190, 66, 16)),
                       ),
-                      const SizedBox(
-                          height: 8), // espacio entre cuadrado y texto
-                      Text(
-                        "Posición (${posicion?.length})",
-                        style: const TextStyle(
+                      child: const Center(
+                        child: Icon(
+                          Icons.location_on,
                           color: Colors.white,
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
+                          size: 50,
                         ),
-                        textAlign: TextAlign.center,
                       ),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(height: 8), // espacio entre cuadrado y texto
+                    Text(
+                      "Posición (${posicion?.length})",
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
                 ),
-                // HISTORICOS
-                InkWell(
-                  onTap: () {
-                    Navigator.pushNamed(context, "/historicos");
-                  },
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        width: 90,
-                        height: 90,
-                        decoration: BoxDecoration(
-                          color: Color.fromARGB(117, 190, 66, 16),
-                          borderRadius: BorderRadius.circular(100),
-                          border: Border.all(
-                              color: Color.fromARGB(117, 190, 66, 16)),
-                        ),
-                        child: const Center(
-                          child: Icon(
-                            Icons.description,
-                            color: Colors.white,
-                            size: 50,
-                          ),
-                        ),
+              ),
+              // HISTORICOS
+              InkWell(
+                onTap: () {
+                  Navigator.pushNamed(context, "/historicos");
+                },
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 90,
+                      height: 90,
+                      decoration: BoxDecoration(
+                        color: Color.fromARGB(117, 190, 66, 16),
+                        borderRadius: BorderRadius.circular(100),
+                        border:
+                            Border.all(color: Color.fromARGB(117, 190, 66, 16)),
                       ),
-                      const SizedBox(
-                          height: 8), // espacio entre cuadrado y texto
-                      const Text(
-                        "Históricos",
-                        style: TextStyle(
+                      child: const Center(
+                        child: Icon(
+                          Icons.description,
                           color: Colors.white,
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
+                          size: 50,
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(height: 8), // espacio entre cuadrado y texto
+                    const Text(
+                      "Históricos",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
                 ),
-                // HERRAMIENTAS
-                InkWell(
-                  onTap: () {
-                    Navigator.pushNamed(context, "/herramientas");
-                  },
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        width: 90,
-                        height: 90,
-                        decoration: BoxDecoration(
-                          color: Color.fromARGB(117, 190, 66, 16),
-                          borderRadius: BorderRadius.circular(100),
-                          border: Border.all(
-                              color: Color.fromARGB(117, 190, 66, 16)),
-                        ),
-                        child: const Center(
-                          child: Icon(
-                            Icons.build,
-                            color: Colors.white,
-                            size: 50,
-                          ),
-                        ),
+              ),
+              // HERRAMIENTAS
+              InkWell(
+                onTap: () {
+                  Navigator.pushNamed(context, "/herramientas");
+                },
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 90,
+                      height: 90,
+                      decoration: BoxDecoration(
+                        color: Color.fromARGB(117, 190, 66, 16),
+                        borderRadius: BorderRadius.circular(100),
+                        border:
+                            Border.all(color: Color.fromARGB(117, 190, 66, 16)),
                       ),
-                      const SizedBox(
-                          height: 8), // espacio entre cuadrado y texto
-                      const Text(
-                        "Herramientas",
-                        style: TextStyle(
+                      child: const Center(
+                        child: Icon(
+                          Icons.build,
                           color: Colors.white,
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
+                          size: 50,
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(height: 8), // espacio entre cuadrado y texto
+                    const Text(
+                      "Herramientas",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
                 ),
-                // CERRAR SESIÓN
-                InkWell(
-                  onTap: () async {
-                    // Cambiar el valor de logI a false y guardarlo en SharedPreferences
-                    final prefs = await SharedPreferences.getInstance();
-                    await prefs.setBool('logInOut', false);
+              ),
+              // CERRAR SESIÓN
+              InkWell(
+                onTap: () async {
+                  // Cambiar el valor de logI a false y guardarlo en SharedPreferences
+                  final prefs = await SharedPreferences.getInstance();
+                  await prefs.setBool('logInOut', false);
 
-                    // Actualizar el estado en la aplicación
-                    setState(() {
-                      logI = false;
-                    });
-                    Navigator.pushNamed(context, "/login");
-                  },
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        width: 90,
-                        height: 90,
-                        decoration: BoxDecoration(
-                          color: Color.fromARGB(117, 190, 66, 16),
-                          borderRadius: BorderRadius.circular(100),
-                          border: Border.all(
-                              color: Color.fromARGB(117, 190, 66, 16)),
-                        ),
-                        child: const Center(
-                          child: Icon(
-                            Icons.close,
-                            color: Colors.white,
-                            size: 50,
-                          ),
-                        ),
+                  // Actualizar el estado en la aplicación
+                  setState(() {
+                    logI = false;
+                  });
+                  Navigator.pushNamed(context, "/login");
+                },
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 90,
+                      height: 90,
+                      decoration: BoxDecoration(
+                        color: Color.fromARGB(117, 190, 66, 16),
+                        borderRadius: BorderRadius.circular(100),
+                        border:
+                            Border.all(color: Color.fromARGB(117, 190, 66, 16)),
                       ),
-                      const SizedBox(
-                          height: 8), // espacio entre cuadrado y texto
-                      const Text(
-                        "Cerrar sesión",
-                        style: TextStyle(
+                      child: const Center(
+                        child: Icon(
+                          Icons.close,
                           color: Colors.white,
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
+                          size: 50,
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(height: 8), // espacio entre cuadrado y texto
+                    const Text(
+                      "Cerrar sesión",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
-      ),
+      ]),
     );
   }
 
