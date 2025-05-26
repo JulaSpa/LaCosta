@@ -16,13 +16,13 @@ class _MyHomePageState extends State<MyHomePage> {
   String? username;
   String? password;
   bool? logI;
-  String isAccesoTrue = "true"; //USUARIO Y CONTRASEÑA CORRECTO?
+  bool isAccesoTrue = false; //USUARIO Y CONTRASEÑA CORRECTO?
 
   List<dynamic>? posicion;
 
   List<dynamic>? alertas;
   List? title;
-  bool _isLoading = true;
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -32,13 +32,31 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _initializeData() async {
-    await Future.wait<List<dynamic>>([
-      contarAlertas(),
-      contarPosicion(),
-    ]);
-    setState(() {
-      _isLoading = false;
-    });
+    try {
+      bool accesoExitoso = await accesoResult(); // esperar resultado
+
+      if (mounted) {
+        setState(() {
+          isAccesoTrue = accesoExitoso;
+          _isLoading = true; // solo activás esto después de verificar todo
+        });
+      }
+
+      if (accesoExitoso) {
+        await Future.wait([
+          contarAlertas(),
+          contarPosicion(),
+        ]);
+      }
+    } catch (e) {
+      print('Ocurrió un error durante la carga: $e');
+      if (mounted) {
+        setState(() {
+          isAccesoTrue = false;
+          _isLoading = true; // mostrar la pantalla de error
+        });
+      }
+    }
   }
 
   //DATA DE SHARED
@@ -65,6 +83,35 @@ class _MyHomePageState extends State<MyHomePage> {
     // Verifica si los datos aún no se han enviado antes de cargarlos
   }
 
+  //LOGIN
+  Future<bool> accesoResult() async {
+    final prefs = await SharedPreferences.getInstance();
+    final usuario = prefs.getString('username');
+    final clave = prefs.getString('password');
+
+    final uri = Uri.parse(
+      'http://app.lacostacereales.com.ar/api/Documento/Acceso?usuario=$usuario&clave=$clave',
+    );
+
+    final response = await http.post(
+      uri,
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "POST, GET, OPTIONS, PUT, DELETE, HEAD",
+      },
+    );
+    print("respuesta");
+    print(response.statusCode);
+    if (response.statusCode == 200) {
+      setState(() {
+        isAccesoTrue = true;
+      });
+    } else {
+      print("usuario o contraseña incorrectos");
+    }
+    return response.statusCode == 200;
+  }
   //OBTENER DATOS POSICIÓN
   //contar posicion
 
@@ -88,8 +135,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
     final decoded = jsonDecode(response.body);
     final posicion = decoded['ttDocumento'];
-
-    print("Cantidad de posición: ${posicion.length}");
+    if (posicion == null || posicion is! List) {
+      print("ttDocumento es null o no es una lista");
+      setState(() {
+        this.posicion = [];
+      });
+      return [];
+    }
 
     setState(() {
       this.posicion = posicion;
@@ -119,8 +171,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
     final decoded = jsonDecode(response.body);
     final alertas = decoded['ttDocumento'];
-
-    print("Cantidad de alertas: ${alertas.length}");
+    if (alertas == null || alertas is! List) {
+      print("ttDocumento es null o no es una lista");
+      setState(() {
+        this.alertas = [];
+      });
+      return [];
+    }
 
     setState(() {
       this.alertas = alertas;
@@ -159,7 +216,7 @@ class _MyHomePageState extends State<MyHomePage> {
         appBar: AppBar(
           elevation: 0,
           iconTheme: const IconThemeData(color: Colors.white),
-          automaticallyImplyLeading: true, // Desactivamos el automático
+          automaticallyImplyLeading: true,
           title: Row(
             mainAxisSize: MainAxisSize.min, // evita que se estire demasiado
             children: [
@@ -180,13 +237,14 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           backgroundColor: Colors.transparent,
           centerTitle: true,
-
           toolbarHeight: 120,
         ),
-        body: _isLoading
+        body: !_isLoading
             ? const Center(
-                child: CircularProgressIndicator()) // muestra loading
-            : isAccesoTrue == "true"
+                child: CircularProgressIndicator(),
+              )
+            // muestra loading
+            : isAccesoTrue
                 ? _buildScrollView() // contenido principal
                 : _buildErrorText(),
       )
@@ -204,7 +262,7 @@ class _MyHomePageState extends State<MyHomePage> {
             alignment: WrapAlignment.center,
             children: [
               // MI PERFIL
-              InkWell(
+              /*  InkWell(
                 onTap: () {
                   Navigator.pushNamed(context, "/perfil");
                 },
@@ -239,7 +297,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ],
                 ),
-              ),
+              ), */
 
               // ALERTAS
               InkWell(

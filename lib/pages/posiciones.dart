@@ -480,7 +480,7 @@ class _PositionState extends State<Position> {
                                                             .fromSTEB(
                                                                 40, 0, 0, 10),
                                                     child: Text(
-                                                      "NÚMERO CP: ",
+                                                      "NÚMERO CTGE: ",
                                                       style: TextStyle(
                                                         fontSize: 15,
                                                         color: Color.fromARGB(
@@ -843,9 +843,7 @@ void _downLoad(
         final jsonResponse = jsonDecode(response.body);
         final List<dynamic> imagenes = jsonResponse['ttImagenes'];
 
-        final base64Image = imagenes[0]['data_CP'];
-
-        _showImageDialog(context, base64Image);
+        _showImageDialog(context, imagenes);
       } else {
         Navigator.of(context).pop();
         print('Error al descargar la imagen');
@@ -861,7 +859,7 @@ void _downLoad(
   }
 }
 
-void _showImageDialog(BuildContext context, String base64Image) {
+void _showImageDialog(BuildContext context, List<dynamic> imagenes) {
   showDialog(
     context: context,
     builder: (context) {
@@ -882,7 +880,11 @@ void _showImageDialog(BuildContext context, String base64Image) {
               ),
               TextButton(
                 onPressed: () {
-                  _shareImage(base64Image);
+                  final List<String> todasLasImagenes = imagenes
+                      .map<String>((img) => img['data_CP'].toString())
+                      .toList();
+
+                  _shareImages(todasLasImagenes);
                 },
                 child: const Icon(
                   Icons.share,
@@ -895,8 +897,9 @@ void _showImageDialog(BuildContext context, String base64Image) {
           Expanded(
             child: PhotoViewGallery.builder(
               scrollPhysics: const BouncingScrollPhysics(),
-              itemCount: 1,
+              itemCount: imagenes.length,
               builder: (context, index) {
+                final base64Image = imagenes[index]['data_CP'];
                 return PhotoViewGalleryPageOptions(
                   imageProvider: MemoryImage(base64.decode(base64Image)),
                   minScale: PhotoViewComputedScale.contained,
@@ -916,22 +919,27 @@ void _showImageDialog(BuildContext context, String base64Image) {
   );
 }
 
-Future<void> _shareImage(String base64Image) async {
+Future<void> _shareImages(List<String> base64Images) async {
   try {
-    // Decodificar la cadena base64 en bytes
-    Uint8List bytes = base64.decode(base64Image);
-
-    // Obtener un directorio temporal para guardar el archivo
+    // Obtener el directorio temporal
     Directory tempDir = await getTemporaryDirectory();
-    String tempFilePath = '${tempDir.path}/temp_image.png';
 
-    // Guardar los bytes en un archivo temporal
-    File tempFile = File(tempFilePath);
-    await tempFile.writeAsBytes(bytes);
+    // Lista de rutas de archivos temporales
+    List<String> tempFilePaths = [];
 
-    // Compartir el archivo
-    await Share.shareFiles([tempFilePath]);
+    for (int i = 0; i < base64Images.length; i++) {
+      Uint8List bytes = base64.decode(base64Images[i]);
+      String tempFilePath = '${tempDir.path}/temp_image_$i.png';
+
+      File tempFile = File(tempFilePath);
+      await tempFile.writeAsBytes(bytes);
+
+      tempFilePaths.add(tempFilePath);
+    }
+
+    // Compartir todos los archivos
+    await Share.shareFiles(tempFilePaths);
   } catch (e) {
-    print('Error al compartir la imagen: $e');
+    print('Error al compartir las imágenes: $e');
   }
 }

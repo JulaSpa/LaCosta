@@ -7,6 +7,7 @@ import 'package:la_costa_cereales/pages/posiciones.dart';
 import 'package:la_costa_cereales/pages/alertas.dart';
 import 'package:la_costa_cereales/pages/historicos.dart';
 import 'package:la_costa_cereales/pages/buscar.dart';
+import 'package:la_costa_cereales/pages/herramientas.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,6 +34,7 @@ class MyApp extends StatelessWidget {
         "/alertas": (context) => const Alertas(),
         "/historicos": (context) => const Historic(),
         "/buscar": (context) => const Buscar(),
+        "/herramientas": (context) => const Tool(),
       },
     );
   }
