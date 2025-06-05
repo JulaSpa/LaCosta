@@ -69,7 +69,7 @@ class Album {
       rem3: json["remitente3"] ?? '',
       xcorredor1: json["corredorComp"] ?? '',
       xcorredor2: json["corredorVend"] ?? '',
-      kg: json["taraPro"] ?? '',
+      kg: json["netoPro"] ?? '',
     );
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-/* import 'package:http/http.dart' as http; */
+import 'package:photo_view/photo_view.dart';
+import 'package:photo_view/photo_view_gallery.dart';
 
 class Tool extends StatefulWidget {
   const Tool({super.key});
@@ -78,39 +79,62 @@ class _ToolState extends State<Tool> {
                     child: SizedBox(
                       width: double.infinity,
                       child: InkWell(
-                        // Cambiamos GestureDetector por InkWell para efecto visual
                         onTap: () {
                           showDialog(
                             context: context,
                             builder: (context) => Dialog(
-                              insetPadding: const EdgeInsets.only(
-                                top:
-                                    1, // más chico que 16 → más alto el diálogo
-                                left: 10,
-                                right: 10,
-                                bottom: 1,
-                              ),
-                              child: InteractiveViewer(
-                                panEnabled: true,
-                                minScale: 0.5,
-                                maxScale: 5,
-                                child: Image.network(
-                                  'http://www.lacostacereales.com.ar/assets/images/gastos-1-1066x642.png',
-                                  fit: BoxFit.contain,
-                                ),
+                              insetPadding:
+                                  EdgeInsets.zero, // pantalla completa
+                              backgroundColor:
+                                  const Color.fromARGB(75, 0, 0, 0),
+                              child: Stack(
+                                children: [
+                                  PhotoViewGallery.builder(
+                                    itemCount: 1, // número de imágenes
+                                    builder: (context, index) {
+                                      return PhotoViewGalleryPageOptions(
+                                        imageProvider: const NetworkImage(
+                                          'http://www.lacostacereales.com.ar/assets/images/gastos-1-1066x642.png',
+                                        ),
+                                        minScale:
+                                            PhotoViewComputedScale.contained,
+                                        maxScale:
+                                            PhotoViewComputedScale.covered * 3,
+                                        heroAttributes:
+                                            const PhotoViewHeroAttributes(
+                                                tag: "gastos-img"),
+                                      );
+                                    },
+                                    scrollPhysics:
+                                        const BouncingScrollPhysics(),
+                                    backgroundDecoration: const BoxDecoration(
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                  Positioned(
+                                    top: 40,
+                                    right: 20,
+                                    child: IconButton(
+                                      icon: const Icon(Icons.close,
+                                          color: Colors.white),
+                                      onPressed: () =>
+                                          Navigator.of(context).pop(),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           );
                         },
-                        splashColor: Colors.white24, // efecto de toque
-                        highlightColor: Colors
-                            .white10, // efecto mientras se mantiene presionado
+                        splashColor: Colors.white24,
+                        highlightColor: Colors.white10,
                         child: const Padding(
                           padding: EdgeInsets.only(
-                              left: 62.0,
-                              right: 62.0,
-                              top: 20.0,
-                              bottom: 20), // separación del borde
+                            left: 62.0,
+                            right: 62.0,
+                            top: 20.0,
+                            bottom: 20.0,
+                          ),
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
@@ -119,14 +143,13 @@ class _ToolState extends State<Tool> {
                                 color: Colors.white,
                                 size: 60,
                               ),
-                              SizedBox(
-                                  width: 16), // espacio entre ícono y texto
+                              SizedBox(width: 16),
                               Expanded(
                                 child: Text(
                                   "Gastos de secada",
                                   style: TextStyle(
                                     color: Colors.white,
-                                    fontSize: 18, // texto más grande
+                                    fontSize: 18,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -147,39 +170,62 @@ class _ToolState extends State<Tool> {
                     child: SizedBox(
                       width: double.infinity,
                       child: InkWell(
-                        // Cambiamos GestureDetector por InkWell para efecto visual
                         onTap: () {
                           showDialog(
                             context: context,
                             builder: (context) => Dialog(
-                              insetPadding: const EdgeInsets.only(
-                                top:
-                                    1, // más chico que 16 → más alto el diálogo
-                                left: 10,
-                                right: 10,
-                                bottom: 1,
-                              ),
-                              child: InteractiveViewer(
-                                panEnabled: true,
-                                minScale: 0.5,
-                                maxScale: 5,
-                                child: Image.network(
-                                  'http://www.lacostacereales.com.ar/assets/images/tipos-de-camiones-que-reciben-las-plantas-974x1316.png',
-                                  fit: BoxFit.contain,
-                                ),
+                              insetPadding:
+                                  EdgeInsets.zero, // pantalla completa
+                              backgroundColor:
+                                  const Color.fromARGB(75, 0, 0, 0),
+                              child: Stack(
+                                children: [
+                                  PhotoViewGallery.builder(
+                                    itemCount: 1, // número de imágenes
+                                    builder: (context, index) {
+                                      return PhotoViewGalleryPageOptions(
+                                        imageProvider: const NetworkImage(
+                                          'http://www.lacostacereales.com.ar/assets/images/tipos-de-camiones-que-reciben-las-plantas-974x1316.png',
+                                        ),
+                                        minScale:
+                                            PhotoViewComputedScale.contained,
+                                        maxScale:
+                                            PhotoViewComputedScale.covered * 3,
+                                        heroAttributes:
+                                            const PhotoViewHeroAttributes(
+                                                tag: "gastos-img"),
+                                      );
+                                    },
+                                    scrollPhysics:
+                                        const BouncingScrollPhysics(),
+                                    backgroundDecoration: const BoxDecoration(
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                  Positioned(
+                                    top: 40,
+                                    right: 20,
+                                    child: IconButton(
+                                      icon: const Icon(Icons.close,
+                                          color: Colors.white),
+                                      onPressed: () =>
+                                          Navigator.of(context).pop(),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           );
                         },
-                        splashColor: Colors.white24, // efecto de toque
-                        highlightColor: Colors
-                            .white10, // efecto mientras se mantiene presionado
+                        splashColor: Colors.white24,
+                        highlightColor: Colors.white10,
                         child: const Padding(
                           padding: EdgeInsets.only(
-                              left: 62.0,
-                              right: 62.0,
-                              top: 20.0,
-                              bottom: 20), // separación del borde
+                            left: 62.0,
+                            right: 62.0,
+                            top: 20.0,
+                            bottom: 20.0,
+                          ),
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
@@ -188,14 +234,13 @@ class _ToolState extends State<Tool> {
                                 color: Colors.white,
                                 size: 60,
                               ),
-                              SizedBox(
-                                  width: 16), // espacio entre ícono y texto
+                              SizedBox(width: 16),
                               Expanded(
                                 child: Text(
                                   "Tipos de camiones admitidos en puertos",
                                   style: TextStyle(
                                     color: Colors.white,
-                                    fontSize: 18, // texto más grande
+                                    fontSize: 18,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -216,55 +261,77 @@ class _ToolState extends State<Tool> {
                     child: SizedBox(
                       width: double.infinity,
                       child: InkWell(
-                        // Cambiamos GestureDetector por InkWell para efecto visual
                         onTap: () {
                           showDialog(
                             context: context,
                             builder: (context) => Dialog(
-                              insetPadding: const EdgeInsets.only(
-                                top:
-                                    1, // más chico que 16 → más alto el diálogo
-                                left: 10,
-                                right: 10,
-                                bottom: 1,
-                              ),
-                              child: InteractiveViewer(
-                                panEnabled: true,
-                                minScale: 0.5,
-                                maxScale: 5,
-                                child: Image.network(
-                                  'http://lacostacereales.com.ar/assets/images/acondiciona-1400x774.png',
-                                  fit: BoxFit.contain,
-                                ),
+                              insetPadding:
+                                  EdgeInsets.zero, // pantalla completa
+                              backgroundColor:
+                                  const Color.fromARGB(75, 0, 0, 0),
+                              child: Stack(
+                                children: [
+                                  PhotoViewGallery.builder(
+                                    itemCount: 1, // número de imágenes
+                                    builder: (context, index) {
+                                      return PhotoViewGalleryPageOptions(
+                                        imageProvider: const NetworkImage(
+                                          'http://lacostacereales.com.ar/assets/images/acondiciona-1400x774.png',
+                                        ),
+                                        minScale:
+                                            PhotoViewComputedScale.contained,
+                                        maxScale:
+                                            PhotoViewComputedScale.covered * 3,
+                                        heroAttributes:
+                                            const PhotoViewHeroAttributes(
+                                                tag: "gastos-img"),
+                                      );
+                                    },
+                                    scrollPhysics:
+                                        const BouncingScrollPhysics(),
+                                    backgroundDecoration: const BoxDecoration(
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                  Positioned(
+                                    top: 40,
+                                    right: 20,
+                                    child: IconButton(
+                                      icon: const Icon(Icons.close,
+                                          color: Colors.white),
+                                      onPressed: () =>
+                                          Navigator.of(context).pop(),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           );
                         },
-                        splashColor: Colors.white24, // efecto de toque
-                        highlightColor: Colors
-                            .white10, // efecto mientras se mantiene presionado
+                        splashColor: Colors.white24,
+                        highlightColor: Colors.white10,
                         child: const Padding(
                           padding: EdgeInsets.only(
-                              left: 62.0,
-                              right: 62.0,
-                              top: 20.0,
-                              bottom: 20), // separación del borde
+                            left: 62.0,
+                            right: 62.0,
+                            top: 20.0,
+                            bottom: 20.0,
+                          ),
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Icon(
-                                Icons.money_outlined,
+                                Icons.money_rounded,
                                 color: Colors.white,
                                 size: 60,
                               ),
-                              SizedBox(
-                                  width: 16), // espacio entre ícono y texto
+                              SizedBox(width: 16),
                               Expanded(
                                 child: Text(
                                   "Tarifa de acondicionadoras",
                                   style: TextStyle(
                                     color: Colors.white,
-                                    fontSize: 18, // texto más grande
+                                    fontSize: 18,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -285,55 +352,77 @@ class _ToolState extends State<Tool> {
                     child: SizedBox(
                       width: double.infinity,
                       child: InkWell(
-                        // Cambiamos GestureDetector por InkWell para efecto visual
                         onTap: () {
                           showDialog(
                             context: context,
                             builder: (context) => Dialog(
-                              insetPadding: const EdgeInsets.only(
-                                top:
-                                    1, // más chico que 16 → más alto el diálogo
-                                left: 10,
-                                right: 10,
-                                bottom: 1,
-                              ),
-                              child: InteractiveViewer(
-                                panEnabled: true,
-                                minScale: 0.5,
-                                maxScale: 5,
-                                child: Image.network(
-                                  'http://www.lacostacereales.com.ar/assets/images/plantas2-1079x2679.png',
-                                  fit: BoxFit.contain,
-                                ),
+                              insetPadding:
+                                  EdgeInsets.zero, // pantalla completa
+                              backgroundColor:
+                                  const Color.fromARGB(75, 0, 0, 0),
+                              child: Stack(
+                                children: [
+                                  PhotoViewGallery.builder(
+                                    itemCount: 1, // número de imágenes
+                                    builder: (context, index) {
+                                      return PhotoViewGalleryPageOptions(
+                                        imageProvider: const NetworkImage(
+                                          'http://www.lacostacereales.com.ar/assets/images/plantas2-1079x2679.png',
+                                        ),
+                                        minScale:
+                                            PhotoViewComputedScale.contained,
+                                        maxScale:
+                                            PhotoViewComputedScale.covered * 3,
+                                        heroAttributes:
+                                            const PhotoViewHeroAttributes(
+                                                tag: "gastos-img"),
+                                      );
+                                    },
+                                    scrollPhysics:
+                                        const BouncingScrollPhysics(),
+                                    backgroundDecoration: const BoxDecoration(
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                  Positioned(
+                                    top: 40,
+                                    right: 20,
+                                    child: IconButton(
+                                      icon: const Icon(Icons.close,
+                                          color: Colors.white),
+                                      onPressed: () =>
+                                          Navigator.of(context).pop(),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           );
                         },
-                        splashColor: Colors.white24, // efecto de toque
-                        highlightColor: Colors
-                            .white10, // efecto mientras se mantiene presionado
+                        splashColor: Colors.white24,
+                        highlightColor: Colors.white10,
                         child: const Padding(
                           padding: EdgeInsets.only(
-                              left: 62.0,
-                              right: 62.0,
-                              top: 20.0,
-                              bottom: 20), // separación del borde
+                            left: 62.0,
+                            right: 62.0,
+                            top: 20.0,
+                            bottom: 20.0,
+                          ),
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Icon(
-                                Icons.info_rounded,
+                                Icons.book_online,
                                 color: Colors.white,
                                 size: 60,
                               ),
-                              SizedBox(
-                                  width: 16), // espacio entre ícono y texto
+                              SizedBox(width: 16),
                               Expanded(
                                 child: Text(
                                   "Códigos en puertos y plantas",
                                   style: TextStyle(
                                     color: Colors.white,
-                                    fontSize: 18, // texto más grande
+                                    fontSize: 18,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -354,39 +443,62 @@ class _ToolState extends State<Tool> {
                     child: SizedBox(
                       width: double.infinity,
                       child: InkWell(
-                        // Cambiamos GestureDetector por InkWell para efecto visual
                         onTap: () {
                           showDialog(
                             context: context,
                             builder: (context) => Dialog(
-                              insetPadding: const EdgeInsets.only(
-                                top:
-                                    1, // más chico que 16 → más alto el diálogo
-                                left: 10,
-                                right: 10,
-                                bottom: 1,
-                              ),
-                              child: InteractiveViewer(
-                                panEnabled: true,
-                                minScale: 0.5,
-                                maxScale: 5,
-                                child: Image.network(
-                                  'http://www.lacostacereales.com.ar/assets/images/tolerancia-blnz-627x326.png',
-                                  fit: BoxFit.contain,
-                                ),
+                              insetPadding:
+                                  EdgeInsets.zero, // pantalla completa
+                              backgroundColor:
+                                  const Color.fromARGB(75, 0, 0, 0),
+                              child: Stack(
+                                children: [
+                                  PhotoViewGallery.builder(
+                                    itemCount: 1, // número de imágenes
+                                    builder: (context, index) {
+                                      return PhotoViewGalleryPageOptions(
+                                        imageProvider: const NetworkImage(
+                                          'http://www.lacostacereales.com.ar/assets/images/tolerancia-blnz-627x326.png',
+                                        ),
+                                        minScale:
+                                            PhotoViewComputedScale.contained,
+                                        maxScale:
+                                            PhotoViewComputedScale.covered * 3,
+                                        heroAttributes:
+                                            const PhotoViewHeroAttributes(
+                                                tag: "gastos-img"),
+                                      );
+                                    },
+                                    scrollPhysics:
+                                        const BouncingScrollPhysics(),
+                                    backgroundDecoration: const BoxDecoration(
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                  Positioned(
+                                    top: 40,
+                                    right: 20,
+                                    child: IconButton(
+                                      icon: const Icon(Icons.close,
+                                          color: Colors.white),
+                                      onPressed: () =>
+                                          Navigator.of(context).pop(),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           );
                         },
-                        splashColor: Colors.white24, // efecto de toque
-                        highlightColor: Colors
-                            .white10, // efecto mientras se mantiene presionado
+                        splashColor: Colors.white24,
+                        highlightColor: Colors.white10,
                         child: const Padding(
                           padding: EdgeInsets.only(
-                              left: 62.0,
-                              right: 62.0,
-                              top: 20.0,
-                              bottom: 20), // separación del borde
+                            left: 62.0,
+                            right: 62.0,
+                            top: 20.0,
+                            bottom: 20.0,
+                          ),
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
@@ -395,14 +507,13 @@ class _ToolState extends State<Tool> {
                                 color: Colors.white,
                                 size: 60,
                               ),
-                              SizedBox(
-                                  width: 16), // espacio entre ícono y texto
+                              SizedBox(width: 16),
                               Expanded(
                                 child: Text(
                                   "Tolerancia en balanzas",
                                   style: TextStyle(
                                     color: Colors.white,
-                                    fontSize: 18, // texto más grande
+                                    fontSize: 18,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -423,55 +534,77 @@ class _ToolState extends State<Tool> {
                     child: SizedBox(
                       width: double.infinity,
                       child: InkWell(
-                        // Cambiamos GestureDetector por InkWell para efecto visual
                         onTap: () {
                           showDialog(
                             context: context,
                             builder: (context) => Dialog(
-                              insetPadding: const EdgeInsets.only(
-                                top:
-                                    1, // más chico que 16 → más alto el diálogo
-                                left: 10,
-                                right: 10,
-                                bottom: 1,
-                              ),
-                              child: InteractiveViewer(
-                                panEnabled: true,
-                                minScale: 0.5,
-                                maxScale: 5,
-                                child: Image.network(
-                                  'http://www.lacostacereales.com.ar/assets/images/cupo-1400x665.png',
-                                  fit: BoxFit.contain,
-                                ),
+                              insetPadding:
+                                  EdgeInsets.zero, // pantalla completa
+                              backgroundColor:
+                                  const Color.fromARGB(75, 0, 0, 0),
+                              child: Stack(
+                                children: [
+                                  PhotoViewGallery.builder(
+                                    itemCount: 1, // número de imágenes
+                                    builder: (context, index) {
+                                      return PhotoViewGalleryPageOptions(
+                                        imageProvider: const NetworkImage(
+                                          'http://www.lacostacereales.com.ar/assets/images/cupo-1400x665.png',
+                                        ),
+                                        minScale:
+                                            PhotoViewComputedScale.contained,
+                                        maxScale:
+                                            PhotoViewComputedScale.covered * 3,
+                                        heroAttributes:
+                                            const PhotoViewHeroAttributes(
+                                                tag: "gastos-img"),
+                                      );
+                                    },
+                                    scrollPhysics:
+                                        const BouncingScrollPhysics(),
+                                    backgroundDecoration: const BoxDecoration(
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                  Positioned(
+                                    top: 40,
+                                    right: 20,
+                                    child: IconButton(
+                                      icon: const Icon(Icons.close,
+                                          color: Colors.white),
+                                      onPressed: () =>
+                                          Navigator.of(context).pop(),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           );
                         },
-                        splashColor: Colors.white24, // efecto de toque
-                        highlightColor: Colors
-                            .white10, // efecto mientras se mantiene presionado
+                        splashColor: Colors.white24,
+                        highlightColor: Colors.white10,
                         child: const Padding(
                           padding: EdgeInsets.only(
-                              left: 62.0,
-                              right: 62.0,
-                              top: 20.0,
-                              bottom: 20), // separación del borde
+                            left: 62.0,
+                            right: 62.0,
+                            top: 20.0,
+                            bottom: 20.0,
+                          ),
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Icon(
-                                Icons.calendar_month_rounded,
+                                Icons.calendar_month,
                                 color: Colors.white,
                                 size: 60,
                               ),
-                              SizedBox(
-                                  width: 16), // espacio entre ícono y texto
+                              SizedBox(width: 16),
                               Expanded(
                                 child: Text(
                                   "Horarios de cupos",
                                   style: TextStyle(
                                     color: Colors.white,
-                                    fontSize: 18, // texto más grande
+                                    fontSize: 18,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),

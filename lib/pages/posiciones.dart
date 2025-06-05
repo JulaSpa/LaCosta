@@ -843,7 +843,27 @@ void _downLoad(
         final jsonResponse = jsonDecode(response.body);
         final List<dynamic> imagenes = jsonResponse['ttImagenes'];
 
-        _showImageDialog(context, imagenes);
+        print("imagenes");
+        print(imagenes);
+        if (imagenes.isEmpty) {
+          // Mostrar mensaje si no hay imágenes
+          print("Mostrando diálogo: sin imágenes");
+          await showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text("Sin imágenes"),
+              content: const Text("Este comprobante no contiene imágenes."),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text("Aceptar"),
+                ),
+              ],
+            ),
+          );
+        } else {
+          _showImageDialog(context, imagenes);
+        }
       } else {
         Navigator.of(context).pop();
         print('Error al descargar la imagen');

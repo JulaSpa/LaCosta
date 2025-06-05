@@ -9,8 +9,13 @@ import 'package:share_plus/share_plus.dart';
 import 'package:flutter/services.dart';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
+import 'package:dio/dio.dart';
 
 import 'package:la_costa_cereales/pages/detalles.dart';
+
+import 'package:path/path.dart' as path;
+
+import 'package:flutter_file_dialog/flutter_file_dialog.dart';
 
 class Buscar extends StatefulWidget {
   const Buscar({super.key});
@@ -27,6 +32,8 @@ class _BuscarState extends State<Buscar> {
   String? nroCp;
   Future<List<Album>> futureAlbum = Future.value([]);
   bool isLoading = true;
+  List<dynamic> documentos = [];
+  bool _descargando = false;
 //BUSCAR POR PALABRA CLAVE
   var searchController = TextEditingController();
   String ordenarPor = 'Seleccionar';
@@ -122,6 +129,9 @@ class _BuscarState extends State<Buscar> {
     final posicion = decoded['ttDocumento'];
     print("buscar");
     print(posicion);
+    setState(() {
+      documentos = posicion;
+    });
     try {
       final List<dynamic> responseJson = posicion;
 
@@ -132,6 +142,91 @@ class _BuscarState extends State<Buscar> {
     } catch (e) {
       print("Error decoding JSON: $e");
       throw Exception('Failed to decode JSON');
+    }
+  }
+
+//DESCARGA EXCEL
+  Future<void> descargarExcel() async {
+    setState(() {
+      _descargando = true;
+    });
+
+    final usuario = username;
+    final clave = password;
+    final nrocp = nroCp;
+
+    final regExp = RegExp(r'^(\d{4})-(\d{2})-(\d{2})');
+    final fechad = fromDate != null ? regExp.firstMatch(fromDate!) : null;
+    final fechah = toDate != null ? regExp.firstMatch(toDate!) : null;
+
+    String fechaFormateadaD = '';
+    String fechaFormateadaH = '';
+    if (fechad != null) {
+      final anio = fechad.group(1);
+      final mes = fechad.group(2);
+      final dia = fechad.group(3);
+      fechaFormateadaD = '$dia/$mes/$anio';
+    }
+    if (fechah != null) {
+      final anio = fechah.group(1);
+      final mes = fechah.group(2);
+      final dia = fechah.group(3);
+      fechaFormateadaH = '$dia/$mes/$anio';
+    }
+
+    try {
+      final url =
+          'http://app.lacostacereales.com.ar/api/Documento/HistoricosArchivo?usuario=$usuario&clave=$clave&nrocp=$nrocp&fechad=$fechaFormateadaD&fechah=$fechaFormateadaH&formato=excel';
+
+      final tempDir = Directory.systemTemp;
+      final filePath = path.join(tempDir.path, 'NUEVA_descargados.xlsx');
+
+      final dio = Dio();
+
+      await dio.download(
+        url,
+        filePath,
+        options: Options(
+          headers: {
+            'User-Agent':
+                'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
+                    '(KHTML, like Gecko) Chrome/90.0.4430.85 Safari/537.36',
+            'Accept': '*/*',
+          },
+        ),
+        onReceiveProgress: (received, total) {
+          if (total != -1) {
+            print(
+                'Descargado: ${(received / total * 100).toStringAsFixed(0)}%');
+          }
+        },
+      );
+      final file = File(filePath);
+      // Guardar en Descargas usando FlutterFileDialog (MediaStore compatible)
+      final params = SaveFileDialogParams(
+        sourceFilePath: file.path,
+        fileName: 'NUEVA_descargados.xlsx',
+      );
+      final savedPath = await FlutterFileDialog.saveFile(params: params);
+
+      if (savedPath != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('✅ Archivo guardado en Descargas')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('❌ Operación cancelada por el usuario')),
+        );
+      }
+    } catch (e) {
+      print('Error al descargar el archivo: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al descargar el archivo: $e')),
+      );
+    } finally {
+      setState(() {
+        _descargando = false;
+      });
     }
   }
 
@@ -165,7 +260,7 @@ class _BuscarState extends State<Buscar> {
                 const Text(
                   "La Costa Cereales SRL",
                   style: TextStyle(
-                    fontSize: 20,
+                    fontSize: 10,
                     fontWeight: FontWeight.bold,
                     color: Colors.white, // o el color que prefieras
                   ),
@@ -174,8 +269,23 @@ class _BuscarState extends State<Buscar> {
             ),
             backgroundColor: Color.fromARGB(117, 0, 0, 0),
             centerTitle: true,
-
             toolbarHeight: 120,
+            actions: [
+              IconButton(
+                icon: _descargando
+                    ? SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : Icon(Icons.download, color: Colors.white),
+                tooltip: 'Descargar Excel',
+                onPressed: _descargando ? null : descargarExcel,
+              ),
+            ],
           ),
           body: DecoratedBox(
             decoration:
@@ -818,8 +928,8 @@ void _downLoad(
   print(username);
   print(password); */
   try {
-    final regExp = RegExp(r'^(\d{4})-(\d{2})-(\d{2})');
-    final fechad = fromD != null ? regExp.firstMatch(fromD) : null;
+    /* final regExp = RegExp(r'^(\d{4})-(\d{2})-(\d{2})'); */
+    /* final fechad = fromD != null ? regExp.firstMatch(fromD) : null;
     final fechah = toD != null ? regExp.firstMatch(toD) : null;
 
     String fechaFormateadaD = '';
@@ -839,13 +949,13 @@ void _downLoad(
       fechaFormateadaH = '$dia/$mes/$anio';
     } else {
       fechaFormateadaH = "";
-    }
+    } */
     print("siii imagenes");
     final usuario = username;
     final clave = password;
     final nnroCP = nroCP;
-    final fromDate = fechaFormateadaD;
-    final toDate = fechaFormateadaH;
+    /*  final fromDate = fechaFormateadaD;
+    final toDate = fechaFormateadaH; */
     //CARGA
     showDialog(
       context: context,
@@ -855,7 +965,7 @@ void _downLoad(
       ),
     );
     final uri = Uri.parse(
-      'http://app.lacostacereales.com.ar/api/Documento/Imagenes?usuario=$usuario&clave=$clave&NroCP=$nnroCP&fechaD=$fromDate&fechaH=$toDate',
+      'http://app.lacostacereales.com.ar/api/Documento/Imagenes?usuario=$usuario&clave=$clave&NroCP=$nnroCP&fechaD=&fechaH=',
     );
 
     final response = await http.post(
@@ -873,7 +983,25 @@ void _downLoad(
         final jsonResponse = jsonDecode(response.body);
         final List<dynamic> imagenes = jsonResponse['ttImagenes'];
 
-        _showImageDialog(context, imagenes);
+        if (imagenes.isEmpty) {
+          // Mostrar mensaje si no hay imágenes
+          print("Mostrando diálogo: sin imágenes");
+          await showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text("Sin imágenes"),
+              content: const Text("Este comprobante no contiene imágenes."),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text("Aceptar"),
+                ),
+              ],
+            ),
+          );
+        } else {
+          _showImageDialog(context, imagenes);
+        }
       } else {
         print('Error al descargar la imagen');
       }
