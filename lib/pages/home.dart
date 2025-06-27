@@ -90,7 +90,7 @@ class _MyHomePageState extends State<MyHomePage> {
     final clave = prefs.getString('password');
 
     final uri = Uri.parse(
-      'http://app.lacostacereales.com.ar/api/Documento/Acceso?usuario=$usuario&clave=$clave',
+      'https://app.lacostacereales.com.ar/api/Documento/Acceso?usuario=$usuario&clave=$clave',
     );
 
     final response = await http.post(
@@ -121,7 +121,7 @@ class _MyHomePageState extends State<MyHomePage> {
     final clave = prefs.getString('password');
 
     final uri = Uri.parse(
-      'http://app.lacostacereales.com.ar/api/Documento/Posicion?usuario=$usuario&clave=$clave',
+      'https://app.lacostacereales.com.ar/api/Documento/Posicion?usuario=$usuario&clave=$clave',
     );
 
     final response = await http.post(
@@ -157,7 +157,7 @@ class _MyHomePageState extends State<MyHomePage> {
     final clave = prefs.getString('password');
 
     final uri = Uri.parse(
-      'http://app.lacostacereales.com.ar/api/Documento/Alertas?usuario=$usuario&clave=$clave',
+      'https://app.lacostacereales.com.ar/api/Documento/Alertas?usuario=$usuario&clave=$clave',
     );
 
     final response = await http.post(

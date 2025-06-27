@@ -12,10 +12,12 @@ import 'package:path_provider/path_provider.dart';
 import 'package:dio/dio.dart';
 
 import 'package:la_costa_cereales/pages/detalles.dart';
-
+import 'package:flutter/foundation.dart';
+import 'dart:html' as html;
 import 'package:path/path.dart' as path;
 
 import 'package:flutter_file_dialog/flutter_file_dialog.dart';
+import 'package:open_filex/open_filex.dart';
 
 class Buscar extends StatefulWidget {
   const Buscar({super.key});
@@ -111,7 +113,7 @@ class _BuscarState extends State<Buscar> {
     print(fechaFormateadaD);
     print(fechaFormateadaH);
     final uri = Uri.parse(
-      'http://app.lacostacereales.com.ar/api/Documento/historicos?usuario=$usuario&clave=$clave&nrocp=$nrocp&fechad=$fechaFormateadaD&fechah=$fechaFormateadaH ',
+      'https://app.lacostacereales.com.ar/api/Documento/historicos?usuario=$usuario&clave=$clave&nrocp=$nrocp&fechad=$fechaFormateadaD&fechah=$fechaFormateadaH ',
     );
 
     final response = await http.post(
@@ -145,8 +147,43 @@ class _BuscarState extends State<Buscar> {
     }
   }
 
-//DESCARGA EXCEL
-  Future<void> descargarExcel() async {
+//DIALOGO EXCEL O PDF
+  Future<void> mostrarDialogoFormato() async {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Elegir formato'),
+        content: Text('¿En qué formato querés descargar el archivo?'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              if (kIsWeb) {
+                descargarArchivoWeb(formato: 'excel');
+              } else {
+                descargarArchivo(formato: 'excel');
+              }
+            },
+            child: Text('Excel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              if (kIsWeb) {
+                descargarArchivoWeb(formato: 'pdf');
+              } else {
+                descargarArchivo(formato: 'pdf');
+              }
+            },
+            child: Text('PDF'),
+          ),
+        ],
+      ),
+    );
+  }
+
+//DESCARGA EXCEL/PDF
+  Future<void> descargarArchivo({required String formato}) async {
     setState(() {
       _descargando = true;
     });
@@ -176,10 +213,11 @@ class _BuscarState extends State<Buscar> {
 
     try {
       final url =
-          'http://app.lacostacereales.com.ar/api/Documento/HistoricosArchivo?usuario=$usuario&clave=$clave&nrocp=$nrocp&fechad=$fechaFormateadaD&fechah=$fechaFormateadaH&formato=excel';
+          'https://app.lacostacereales.com.ar/api/Documento/HistoricosArchivo?usuario=$usuario&clave=$clave&nrocp=$nrocp&fechad=$fechaFormateadaD&fechah=$fechaFormateadaH&formato=$formato';
 
       final tempDir = Directory.systemTemp;
-      final filePath = path.join(tempDir.path, 'NUEVA_descargados.xlsx');
+      final extension = formato == 'pdf' ? 'pdf' : 'xlsx';
+      final filePath = path.join(tempDir.path, 'NUEVA_descargados.$extension');
 
       final dio = Dio();
 
@@ -201,11 +239,11 @@ class _BuscarState extends State<Buscar> {
           }
         },
       );
+
       final file = File(filePath);
-      // Guardar en Descargas usando FlutterFileDialog (MediaStore compatible)
       final params = SaveFileDialogParams(
         sourceFilePath: file.path,
-        fileName: 'NUEVA_descargados.xlsx',
+        fileName: 'NUEVA_descargados.$extension',
       );
       final savedPath = await FlutterFileDialog.saveFile(params: params);
 
@@ -213,6 +251,14 @@ class _BuscarState extends State<Buscar> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('✅ Archivo guardado en Descargas')),
         );
+        final result = await OpenFilex.open(savedPath);
+        if (result.type != ResultType.done) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content:
+                    Text('⚠️ No se pudo abrir el archivo automáticamente')),
+          );
+        }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('❌ Operación cancelada por el usuario')),
@@ -222,6 +268,73 @@ class _BuscarState extends State<Buscar> {
       print('Error al descargar el archivo: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error al descargar el archivo: $e')),
+      );
+    } finally {
+      setState(() {
+        _descargando = false;
+      });
+    }
+  }
+
+  //DESCARGA EXCEL/PDF EN WEB
+  Future<void> descargarArchivoWeb({required String formato}) async {
+    setState(() {
+      _descargando = true;
+    });
+
+    final usuario = username;
+    final clave = password;
+    final nrocp = nroCp;
+
+    final regExp = RegExp(r'^(\d{4})-(\d{2})-(\d{2})');
+    final fechad = fromDate != null ? regExp.firstMatch(fromDate!) : null;
+    final fechah = toDate != null ? regExp.firstMatch(toDate!) : null;
+
+    String fechaFormateadaD = '';
+    String fechaFormateadaH = '';
+    if (fechad != null) {
+      final anio = fechad.group(1);
+      final mes = fechad.group(2);
+      final dia = fechad.group(3);
+      fechaFormateadaD = '$dia/$mes/$anio';
+    }
+    if (fechah != null) {
+      final anio = fechah.group(1);
+      final mes = fechah.group(2);
+      final dia = fechah.group(3);
+      fechaFormateadaH = '$dia/$mes/$anio';
+    }
+
+    try {
+      final extension = formato == 'pdf' ? 'pdf' : 'xlsx';
+      final url =
+          'https://app.lacostacereales.com.ar/api/Documento/HistoricosArchivo?usuario=$usuario&clave=$clave&nrocp=$nrocp&fechad=$fechaFormateadaD&fechah=$fechaFormateadaH&formato=$formato';
+
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        final bytes = response.bodyBytes;
+        final blob = html.Blob([bytes]);
+        final urlBlob = html.Url.createObjectUrlFromBlob(blob);
+        final anchor = html.AnchorElement(href: urlBlob)
+          ..setAttribute("download", "NUEVA_descargados.$extension")
+          ..click();
+        html.Url.revokeObjectUrl(urlBlob);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('✅ Archivo descargado ($extension)')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text(
+                  '❌ Error ${response.statusCode} al descargar el archivo')),
+        );
+      }
+    } catch (e) {
+      print('Error al descargar archivo: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al descargar archivo: $e')),
       );
     } finally {
       setState(() {
@@ -260,7 +373,7 @@ class _BuscarState extends State<Buscar> {
                 const Text(
                   "La Costa Cereales SRL",
                   style: TextStyle(
-                    fontSize: 10,
+                    fontSize: 15,
                     fontWeight: FontWeight.bold,
                     color: Colors.white, // o el color que prefieras
                   ),
@@ -283,7 +396,7 @@ class _BuscarState extends State<Buscar> {
                       )
                     : Icon(Icons.download, color: Colors.white),
                 tooltip: 'Descargar Excel',
-                onPressed: _descargando ? null : descargarExcel,
+                onPressed: _descargando ? null : mostrarDialogoFormato,
               ),
             ],
           ),
@@ -965,7 +1078,7 @@ void _downLoad(
       ),
     );
     final uri = Uri.parse(
-      'http://app.lacostacereales.com.ar/api/Documento/Imagenes?usuario=$usuario&clave=$clave&NroCP=$nnroCP&fechaD=&fechaH=',
+      'https://app.lacostacereales.com.ar/api/Documento/Imagenes?usuario=$usuario&clave=$clave&NroCP=$nnroCP&fechaD=&fechaH=',
     );
 
     final response = await http.post(

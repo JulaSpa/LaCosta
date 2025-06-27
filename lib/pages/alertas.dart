@@ -63,7 +63,7 @@ class _AlertasState extends State<Alertas> {
     final clave = password;
 
     final uri = Uri.parse(
-      'http://app.lacostacereales.com.ar/api/Documento/Alertas?usuario=$usuario&clave=$clave',
+      'https://app.lacostacereales.com.ar/api/Documento/Alertas?usuario=$usuario&clave=$clave',
     );
 
     final response = await http.post(
@@ -826,7 +826,7 @@ void _downLoad(
     );
 
     final uri = Uri.parse(
-      'http://app.lacostacereales.com.ar/api/Documento/Imagenes?usuario=$usuario&clave=$clave&NroCP=$nnroCP&fechaD=&fechaH=',
+      'https://app.lacostacereales.com.ar/api/Documento/Imagenes?usuario=$usuario&clave=$clave&NroCP=$nnroCP&fechaD=&fechaH=',
     );
 
     final response = await http.post(
